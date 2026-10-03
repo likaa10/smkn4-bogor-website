@@ -1,0 +1,26 @@
+   <?php
+
+   use Illuminate\Database\Migrations\Migration;
+   use Illuminate\Database\Schema\Blueprint;
+   use Illuminate\Support\Facades\Schema;
+
+   return new class extends Migration
+   {
+       public function up(): void
+       {
+           Schema::dropIfExists('achievements');
+       }
+
+       public function down(): void
+       {
+           Schema::create('achievements', function (Blueprint $table) {
+               $table->id();
+               $table->foreignId('major_id')->constrained()->cascadeOnDelete();
+               $table->string('title');
+               $table->string('level');
+               $table->string('year', 4);
+               $table->string('image')->nullable();
+               $table->timestamps();
+           });
+       }
+   };
