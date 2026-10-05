@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\GalleryController;
 use App\Models\ContactMessage;
 use App\Models\Gallery;
 use App\Models\Information;
@@ -35,9 +36,14 @@ class HomeController extends Controller
             $query->whereHas('major', fn ($q) => $q->where('slug', $request->major));
         }
 
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
         return view('frontend.gallery', [
             'galleries' => $query->get(),
             'majors' => Major::orderBy('name')->get(),
+            'categories' => GalleryController::CATEGORIES,
         ]);
     }
 

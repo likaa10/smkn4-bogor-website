@@ -14,6 +14,15 @@
             </select>
         </div>
         <div class="mb-3">
+            <label class="form-label">Kategori Produk</label>
+            <select name="category" class="form-select">
+                <option value="">-- Pilih Kategori --</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat }}" {{ old('category', $gallery->category) === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="mb-3">
             <label class="form-label">Keterangan</label>
             <input type="text" name="caption" class="form-control" value="{{ old('caption', $gallery->caption) }}">
         </div>

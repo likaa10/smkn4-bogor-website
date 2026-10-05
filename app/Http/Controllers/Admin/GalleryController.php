@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
+    public const CATEGORIES = ['Kegiatan', 'Prestasi', 'Fasilitas', 'Ekstrakurikuler', 'Lainnya'];
+
     public function index(Request $request)
     {
         $query = Gallery::with('major')->latest();
@@ -20,10 +22,20 @@ class GalleryController extends Controller
             $query->where('major_id', $request->major_id);
         }
 
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
         $galleries = $query->get();
         $majors = Major::orderBy('name')->get();
 
-        return view('admin.galleries.index', compact('galleries', 'majors', 'activeMajor'));
+        return view('admin.galleries.index', [
+            'galleries' => $galleries,
+            'majors' => $majors,
+            'activeMajor' => $activeMajor,
+            'categories' => self::CATEGORIES,
+            'activeCategory' => $request->category,
+        ]);
     }
 
     public function create(Request $request)
@@ -31,13 +43,18 @@ class GalleryController extends Controller
         $majors = Major::orderBy('name')->get();
         $selectedMajorId = $request->integer('major_id') ?: null;
 
-        return view('admin.galleries.create', compact('majors', 'selectedMajorId'));
+        return view('admin.galleries.create', [
+            'majors' => $majors,
+            'selectedMajorId' => $selectedMajorId,
+            'categories' => self::CATEGORIES,
+        ]);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
             'major_id' => ['nullable', 'exists:majors,id'],
+            'category' => ['nullable', 'string', 'max:50'],
             'caption' => ['nullable', 'string', 'max:150'],
             'image' => ['required', 'image', 'max:2048'],
         ]);
@@ -48,19 +65,25 @@ class GalleryController extends Controller
 
         return redirect()
             ->route('admin.galleries.index', array_filter(['major_id' => $data['major_id'] ?? null]))
-            ->with('success', 'Foto berhasil ditambahkan ke galeri jurusan ini. Otomatis muncul di halaman jurusan pada frontend.');
+            ->with('success', 'Foto berhasil ditambahkan ke galeri. Otomatis muncul di halaman jurusan pada frontend.');
     }
 
     public function edit(Gallery $gallery)
     {
         $majors = Major::orderBy('name')->get();
-        return view('admin.galleries.edit', compact('gallery', 'majors'));
+
+        return view('admin.galleries.edit', [
+            'gallery' => $gallery,
+            'majors' => $majors,
+            'categories' => self::CATEGORIES,
+        ]);
     }
 
     public function update(Request $request, Gallery $gallery)
     {
         $data = $request->validate([
             'major_id' => ['nullable', 'exists:majors,id'],
+            'category' => ['nullable', 'string', 'max:50'],
             'caption' => ['nullable', 'string', 'max:150'],
             'image' => ['nullable', 'image', 'max:2048'],
         ]);

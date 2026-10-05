@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Gallery extends Model
 {
-    protected $fillable = ['major_id', 'image', 'caption'];
+    protected $fillable = ['major_id', 'category', 'image', 'caption'];
 
     public function major()
     {
